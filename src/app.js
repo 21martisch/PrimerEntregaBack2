@@ -7,11 +7,14 @@ const cartRoutes = require('./routes/carts.router.js');
 const viewsRouter = require("./routes/views.router.js");
 const  usersRouter  = require("./routes/user.routes.js");
 const sessionsRouter = require('./routes/sessions.routes.js');
-
+const ticketRoutes = require('./routes/ticket.routes.js');
+const testRouter = require('./routes/test.router.js');
 
 const app = express(); 
 const PUERTO = 8080;
 const connectDB = require('./db');
+
+require('dotenv').config();
 
 connectDB();
 
@@ -33,6 +36,8 @@ app.use('/api/carts', cartRoutes);
 app.use("/", viewsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/test', testRouter);
 
 app.listen(PUERTO, () => {
     console.log(`Escuchando en el http://localhost:${PUERTO}`); 

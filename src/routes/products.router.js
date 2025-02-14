@@ -1,13 +1,14 @@
-const express = require ("express");
+// src/routes/product.routes.js
+const express = require("express");
 const router = express.Router();
-const ProductManager = require ("../managers/product.manager.js");
-const productManager = new ProductManager();
+const ProductService = require("../services/product.services.js");
+const auth = require("../middlewares/auth.middleware.js");
 
 router.get("/", async (req, res) => {
     try {
         const { limit = 10, page = 1, sort, query } = req.query;
 
-        const productos = await productManager.getProducts({
+        const productos = await ProductService.getProducts({
             limit: parseInt(limit),
             page: parseInt(page),
             sort,
@@ -36,12 +37,11 @@ router.get("/", async (req, res) => {
     }
 });
 
-
 router.get("/:pid", async (req, res) => {
     const id = req.params.pid;
 
     try {
-        const producto = await productManager.getProductById(id);
+        const producto = await ProductService.getProductById(id);
         if (!producto) {
             return res.json({
                 error: "Producto no encontrado"
@@ -57,13 +57,11 @@ router.get("/:pid", async (req, res) => {
     }
 });
 
-
-
-router.post("/", async (req, res) => {
+router.post("/", auth('admin'), async (req, res) => {
     const nuevoProducto = req.body;
 
     try {
-        await productManager.addProduct(nuevoProducto);
+        await ProductService.createProduct(nuevoProducto);
         res.status(201).json({
             message: "Producto agregado exitosamente"
         });
@@ -75,12 +73,12 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:pid", async (req, res) => {
+router.put("/:pid", auth('admin'), async (req, res) => {
     const id = req.params.pid;
     const productoActualizado = req.body;
 
     try {
-        await productManager.updateProduct(id, productoActualizado);
+        await ProductService.updateProduct(id, productoActualizado);
         res.json({
             message: "Producto actualizado exitosamente"
         });
@@ -92,12 +90,11 @@ router.put("/:pid", async (req, res) => {
     }
 });
 
-
-router.delete("/:pid", async (req, res) => {
+router.delete("/:pid", auth('admin'), async (req, res) => {
     const id = req.params.pid;
 
     try {
-        await productManager.deleteProduct(id);
+        const deletedProduct = await ProductService.deleteProduct(id); 
         res.json({
             message: "Producto eliminado exitosamente"
         });
